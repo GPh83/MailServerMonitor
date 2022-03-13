@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "MailServerMonitor": {
+      "commandName": "Project",
+      "commandLineArgs": "-lgff"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {},
+      "distributionName": ""
+    }
+  }
+}
