@@ -1,4 +1,3 @@
-MailServerMonitor
 ![release](https://img.shields.io/github/v/release/GPh83/MailServerMonitor?include_prereleases)
 ![commit](https://img.shields.io/github/last-commit/GPh83/MailServerMonitor) 
 ![issues](https://img.shields.io/github/issues/GPh83/MailServerMonitor) 
