@@ -15,7 +15,7 @@ Simple mail server monitoring with historic in CSV format
 - Ask SMTP and IMAP server
 - Store result in CSV file 
 - Check connection and response time
-
+- Multi server and mail boxes
 
 # Usage
 
