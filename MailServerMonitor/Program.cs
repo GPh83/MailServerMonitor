@@ -63,14 +63,20 @@ namespace MailServerMonitor
                         DataService.SaveConfig();
                         break;
 
+                    case "-u":
+                        DataService.config.AskMin = 0;
+                        CheckMailBoxes();
+                        break;
+
                     // Help
                     default:
                         Console.WriteLine("Check email server and log result in CSV file.");
-                        Console.WriteLine("Command line : MailServerMonitor -d [Num] | -l | -a");
+                        Console.WriteLine("Command line : MailServerMonitor -d [Num] | -l | -a | -u");
                         Console.WriteLine("No argument : Run test, one time is AskMin=0 else every X minutes");
                         Console.WriteLine("One command : ");
                         Console.WriteLine("  -l : List mailboxes");
                         Console.WriteLine("  -a : Add a mailbox");
+                        Console.WriteLine("  -u : One try only ");
                         Console.WriteLine("  -d [Num] : Delete the [Num] mailbox in config");
                         Console.WriteLine("Other settings in config.json");
                         break;
@@ -109,8 +115,9 @@ namespace MailServerMonitor
             {
                 foreach (MailBoxConfig mb in DataService.config.MailBoxes)
                 {
+                    Console.WriteLine("Check : {0}", mb.eMail);
                     var his = Libs.MailBoxTester.Test(mb);
-                    Console.WriteLine("Check : {0}", his.eMail);
+
                     DataService.AddToCSV(his);
                     if (his.StmpConnected)
                     {

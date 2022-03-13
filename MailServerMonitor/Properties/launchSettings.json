@@ -1,7 +1,8 @@
 {
   "profiles": {
     "MailServerMonitor": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-u"
     },
     "WSL": {
       "commandName": "WSL2",
