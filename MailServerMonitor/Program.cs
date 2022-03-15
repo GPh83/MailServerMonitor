@@ -63,6 +63,7 @@ namespace MailServerMonitor
                         DataService.SaveConfig();
                         break;
 
+                    // Unique
                     case "-u":
                         DataService.config.AskMin = 0;
                         CheckMailBoxes();
