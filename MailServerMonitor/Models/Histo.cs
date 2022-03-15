@@ -28,6 +28,8 @@ namespace MailServerMonitor.Models
 
         public bool SendRecieveOk;
 
+        public int DeletedCount;
+
         public string CSVLine(string sep = ";")
         {
             StringBuilder sb = new StringBuilder();
@@ -50,7 +52,10 @@ namespace MailServerMonitor.Models
             sb.Append(ImapResponseTimeMs);
             sb.Append(sep);
             sb.Append(ImapError);
-            sb.AppendLine(sep);
+            sb.Append(sep);
+            sb.Append(DeletedCount);
+            sb.Append(sep);
+            sb.AppendLine();
             return sb.ToString();
         }
 
@@ -76,7 +81,10 @@ namespace MailServerMonitor.Models
             sb.Append("ImapResponseTimeMs");
             sb.Append(sep);
             sb.Append("ImapError");
-            sb.AppendLine(sep);
+            sb.Append(sep);
+            sb.Append("DeletedCount");
+            sb.Append(sep);
+            sb.AppendLine();
             return sb.ToString();
         }
     }

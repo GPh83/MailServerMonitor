@@ -14,6 +14,7 @@ namespace MailServerMonitor.Libs
 {
     internal class MailBoxTester
     {
+        const string TestSubject = "MailServerMonitor : Test";
 
         internal static Histo Test(MailBoxConfig Cfg)
         {
@@ -22,9 +23,9 @@ namespace MailServerMonitor.Libs
             his.ServerName = Cfg.ServerName;
             his.eMail = Cfg.eMail;
 
-            SmtpTest(Cfg, his); 
-            ImapTest(Cfg, his);
-            
+            SmtpTest(Cfg, his);
+            if (ImapTest(Cfg, his)) ImapRemoveTestMessages(Cfg, his);
+
             his.SendRecieveOk = his.StmpConnected && his.ImapConnected;
             return his;
         }
@@ -34,7 +35,7 @@ namespace MailServerMonitor.Libs
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(Cfg.eMail, Cfg.eMail));
             message.To.Add(new MailboxAddress(Cfg.eMail, Cfg.eMail));
-            message.Subject = "MailServerMonitor : Test";
+            message.Subject = TestSubject;
 
             message.Body = new TextPart("plain")
             {
@@ -144,11 +145,49 @@ namespace MailServerMonitor.Libs
                 {
                     his.ImapResponseTimeMs = delay.ElapsedMilliseconds;
                     his.ImapConnected = false;
-                    his.ImapError = "Recieve : " + ex.Message.Replace(Environment.NewLine," | ");
+                    his.ImapError = "Recieve : " + ex.Message.Replace(Environment.NewLine, " | ");
                     return false;
                 }
-               
+
+            }
+        }
+
+        private static bool ImapRemoveTestMessages(MailBoxConfig Cfg, Histo his)
+        {
+            int n=0;
+
+            using (var client = new ImapClient())
+            {
+                try
+                {
+                    client.Timeout = Cfg.TimeOutMs;
+                    client.Connect(Cfg.ServerName, Cfg.ImapPort, Cfg.ImapSSL);
+                    if (!String.IsNullOrEmpty(Cfg.Login)) client.Authenticate(Cfg.Login, Cfg.GetPassword());
+
+                    var inbox = client.Inbox;
+                    inbox.Open(FolderAccess.ReadWrite);
+
+                    foreach (var summary in inbox.Fetch(0, -1, MessageSummaryItems.UniqueId | MessageSummaryItems.Envelope))
+                    {
+                        if (summary.Envelope.Subject == TestSubject)
+                        {
+                            inbox.Store(summary.UniqueId, new StoreFlagsRequest(StoreAction.Add, MessageFlags.Deleted) { Silent = true });
+                            n++;
+                        }
+                    }
+                    inbox.Expunge();
+
+                    client.Disconnect(true);
+                    his.DeletedCount = n;
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
             }
         }
     }
+
 }
+
