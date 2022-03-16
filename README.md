@@ -69,7 +69,7 @@ Made with VS2022 Community.
 
 # Licence 
 
-resticterm Copyright(C) 2022 Philippe GRAILLE.  
+MailServerMonitor Copyright(C) 2022 Philippe GRAILLE.  
 This program comes with ABSOLUTELY NO WARRANTY.  
 This is free software, and you are welcome to redistribute it under certain conditions, see GNU GPL V3 : https://www.gnu.org/licenses/
 
