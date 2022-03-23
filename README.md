@@ -2,7 +2,7 @@
 ![commit](https://img.shields.io/github/last-commit/GPh83/MailServerMonitor) 
 ![issues](https://img.shields.io/github/issues/GPh83/MailServerMonitor) 
 ![downloads](https://img.shields.io/github/downloads/GPh83/MailServerMonitor/total)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![platform](https://img.shields.io/badge/platform-Windows%20Linux-blue)
 
 # MailServerMonitor
