@@ -18,7 +18,7 @@ After you can use LibreOffice Calc or Excel to analyze the data. (Sort/Filter/Gr
 - Store result in CSV file 
 - Check connection, authentication and response time
 - Multi mailboxes
-- Run every X minutes on single time
+- Run every X minutes or single time
 
 # Usage
 
@@ -48,17 +48,18 @@ For running endless :
 **Other settings in config.json :** You can edit with your favorite editor (vi or VSCode for me)
 - AskMin : Ask every X minutes. Default=0=One time
 - CSVName : Output CSV name. Default="MailServerMonitor.csv"
+- Key : Random key for securing password. Change it loose all stored password.
 - For each mailbox :
-  - eMail : email to test (Send and receive)
-  - TimeOutMs : Time out in milliseconde. Default=30000 
-  - ServerName : Server name (FQDN or IP address)
-  - Login : Mailbox Username   
-  - EncryptedPassword : Use -a command for setting this
-  - ImapPort : Imap port. Default=993
-  - ImapSSL : For using SSL/TLS. Default=true
-  - SmtpPort : Smtp port. Default=465
-  - SmtpSSL : For using SSL/TLS. Default=true
-
+  - Name : Name of the mailbox 
+  - For each SMTP & IMAP :
+    - eMail : email to test 
+    - TimeOutMs : Time out in milliseconde. Default=30000 
+    - Server : Server name (FQDN or IP address)
+    - Login : Mailbox Username   
+    - EncryptedPassword : Use -a command for setting this
+    - Port : Imap port. Default=993
+    - UseSSL : For using SSL/TLS. Default=true
+ 
 
 # Contributing
 
