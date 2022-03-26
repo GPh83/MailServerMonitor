@@ -40,8 +40,16 @@ namespace MailServerMonitor.Models
 
         internal void AddToCSV(Histo his)
         {
-            if(!File.Exists(config.CSVName)) File.AppendAllText(config.CSVName, his.CSVHeader());
-            File.AppendAllText(config.CSVName,his.CSVLine());
+            try
+            {
+                if (!File.Exists(config.CSVName)) File.AppendAllText(config.CSVName, his.CSVHeader());
+                File.AppendAllText(config.CSVName, his.CSVLine());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Save to CSV error : " + ex.Message);
+            }
+
         }
     }
 }

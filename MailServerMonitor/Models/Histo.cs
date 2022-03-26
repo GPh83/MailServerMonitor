@@ -9,10 +9,16 @@ namespace MailServerMonitor.Models
     internal class Histo
     {
         public DateTime EventDateTime { get; set; } = DateTime.Now;
+        
+        public string Name { get; set; }
 
-        public string eMail { get; set; }
+        public string SmtpEmail { get; set; }
 
-        public string ServerName { get; set; }
+        public string ImapEmail { get; set; }
+
+        public string SmtpServer { get; set; }
+
+        public string ImapServer { get; set; }
 
         public long SmtpResponseTimeMs;
 
@@ -33,19 +39,25 @@ namespace MailServerMonitor.Models
         public string CSVLine(string sep = ";")
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(ServerName);
-            sb.Append(sep);
-            sb.Append(eMail);
+            sb.Append(Name);
             sb.Append(sep);
             sb.Append(EventDateTime);
             sb.Append(sep);
             sb.Append(SendRecieveOk);
+            sb.Append(sep);
+            sb.Append(SmtpEmail);
+            sb.Append(sep);
+            sb.Append(SmtpServer);
             sb.Append(sep);
             sb.Append(StmpConnected);
             sb.Append(sep);
             sb.Append(SmtpResponseTimeMs);
             sb.Append(sep);
             sb.Append(SmtpError);
+            sb.Append(sep);
+            sb.Append(ImapEmail);
+            sb.Append(sep);
+            sb.Append(ImapServer);
             sb.Append(sep);
             sb.Append(ImapConnected);
             sb.Append(sep);
@@ -62,19 +74,25 @@ namespace MailServerMonitor.Models
         public string CSVHeader(string sep = ";")
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("ServerName");
-            sb.Append(sep);
-            sb.Append("eMail");
+            sb.Append("Name");
             sb.Append(sep);
             sb.Append("EventDateTime");
             sb.Append(sep);
             sb.Append("SendRecieveOk");
+            sb.Append(sep);
+            sb.Append("SmtpEmail");
+            sb.Append(sep);
+            sb.Append("SmtpServer");
             sb.Append(sep);
             sb.Append("StmpConnected");
             sb.Append(sep);
             sb.Append("SmtpResponseTimeMs");
             sb.Append(sep);
             sb.Append("SmtpError");
+            sb.Append(sep);
+            sb.Append("ImapEmail");
+            sb.Append(sep);
+            sb.Append("ImapServer");
             sb.Append(sep);
             sb.Append("ImapConnected");
             sb.Append(sep);

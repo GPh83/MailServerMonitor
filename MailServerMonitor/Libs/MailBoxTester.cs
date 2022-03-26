@@ -16,26 +16,31 @@ namespace MailServerMonitor.Libs
     {
         const string TestSubject = "MailServerMonitor : Test";
 
-        internal static Histo Test(MailBoxConfig Cfg)
+        internal static Histo Test(MailBoxConfig Cfg, string salt)
         {
             Histo his = new Histo();
+            his.Name = Cfg.Name;
 
-            his.ServerName = Cfg.ServerName;
-            his.eMail = Cfg.eMail;
-
-            SmtpTest(Cfg, his);
-            if (ImapTest(Cfg, his)) ImapRemoveTestMessages(Cfg, his);
+            SmtpTest(Cfg, his, salt);
+            if (ImapTest(Cfg, his, salt))
+            {
+                System.Threading.Thread.Sleep(500);
+                ImapRemoveTestMessages(Cfg, his, salt);
+            }
 
             his.SendRecieveOk = his.StmpConnected && his.ImapConnected;
             return his;
         }
 
-        private static bool SmtpTest(MailBoxConfig Cfg, Histo his)
+        private static bool SmtpTest(MailBoxConfig Cfg, Histo his, string salt)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(Cfg.eMail, Cfg.eMail));
-            message.To.Add(new MailboxAddress(Cfg.eMail, Cfg.eMail));
+            message.From.Add(new MailboxAddress(Cfg.Smtp.Email, Cfg.Smtp.Email));
+            message.To.Add(new MailboxAddress(Cfg.Imap.Email, Cfg.Imap.Email));
             message.Subject = TestSubject;
+
+            his.SmtpServer = Cfg.Smtp.Server;
+            his.SmtpEmail = Cfg.Smtp.Email;
 
             message.Body = new TextPart("plain")
             {
@@ -49,8 +54,8 @@ namespace MailServerMonitor.Libs
                 try
                 {
                     delay.Start();
-                    client.Timeout = Cfg.TimeOutMs;
-                    client.Connect(Cfg.ServerName, Cfg.SmtpPort, Cfg.SmtpSSL);
+                    client.Timeout = Cfg.Smtp.TimeOutMs;
+                    client.Connect(Cfg.Smtp.Server, Cfg.Smtp.Port, Cfg.Smtp.UseSSL);
                 }
                 catch (Exception ex)
                 {
@@ -62,9 +67,9 @@ namespace MailServerMonitor.Libs
 
                 try
                 {
-                    if (!String.IsNullOrEmpty(Cfg.Login))
+                    if (!String.IsNullOrEmpty(Cfg.Smtp.Login))
                     {
-                        client.Authenticate(Cfg.Login, Cfg.GetPassword());
+                        client.Authenticate(Cfg.Smtp.Login, Cfg.Smtp.GetPassword(salt));
                     }
 
                 }
@@ -94,8 +99,11 @@ namespace MailServerMonitor.Libs
             }
         }
 
-        private static bool ImapTest(MailBoxConfig Cfg, Histo his)
+        private static bool ImapTest(MailBoxConfig Cfg, Histo his, string salt)
         {
+            his.ImapServer = Cfg.Imap.Server;
+            his.ImapEmail = Cfg.Imap.Email;
+
             using (var client = new ImapClient())
             {
                 Stopwatch delay = new Stopwatch();
@@ -103,8 +111,8 @@ namespace MailServerMonitor.Libs
                 try
                 {
                     delay.Start();
-                    client.Timeout = Cfg.TimeOutMs;
-                    client.Connect(Cfg.ServerName, Cfg.ImapPort, Cfg.ImapSSL);
+                    client.Timeout = Cfg.Imap.TimeOutMs;
+                    client.Connect(Cfg.Imap.Server, Cfg.Imap.Port, Cfg.Imap.UseSSL);
                 }
                 catch (Exception ex)
                 {
@@ -116,9 +124,9 @@ namespace MailServerMonitor.Libs
 
                 try
                 {
-                    if (!String.IsNullOrEmpty(Cfg.Login))
+                    if (!String.IsNullOrEmpty(Cfg.Imap.Login))
                     {
-                        client.Authenticate(Cfg.Login, Cfg.GetPassword());
+                        client.Authenticate(Cfg.Imap.Login, Cfg.Imap.GetPassword(salt));
                     }
 
                 }
@@ -152,17 +160,17 @@ namespace MailServerMonitor.Libs
             }
         }
 
-        private static bool ImapRemoveTestMessages(MailBoxConfig Cfg, Histo his)
+        private static bool ImapRemoveTestMessages(MailBoxConfig Cfg, Histo his, string salt)
         {
-            int n=0;
+            int n = 0;
 
             using (var client = new ImapClient())
             {
                 try
                 {
-                    client.Timeout = Cfg.TimeOutMs;
-                    client.Connect(Cfg.ServerName, Cfg.ImapPort, Cfg.ImapSSL);
-                    if (!String.IsNullOrEmpty(Cfg.Login)) client.Authenticate(Cfg.Login, Cfg.GetPassword());
+                    client.Timeout = Cfg.Imap.TimeOutMs;
+                    client.Connect(Cfg.Imap.Server, Cfg.Imap.Port, Cfg.Imap.UseSSL);
+                    if (!String.IsNullOrEmpty(Cfg.Imap.Login)) client.Authenticate(Cfg.Imap.Login, Cfg.Imap.GetPassword(salt));
 
                     var inbox = client.Inbox;
                     inbox.Open(FolderAccess.ReadWrite);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using MailServerMonitor.Models;
@@ -50,8 +51,10 @@ namespace MailServerMonitor
                         foreach (MailBoxConfig mb in DataService.config.MailBoxes)
                         {
                             i++;
-                            Console.WriteLine("{0} : {1}", i, mb.eMail);
-                            Console.WriteLine("    Server : {0}", mb.ServerName);
+                            Console.WriteLine("{0} : {1}", i, mb.Name);
+                            Console.WriteLine("    SMTP = Email : {0}, Server : {1}:{2}", mb.Smtp.Email, mb.Smtp.Server, mb.Smtp.Port);
+                            Console.WriteLine("    IMAP = Email : {0}, Server : {1}:{2}", mb.Imap.Email, mb.Imap.Server, mb.Imap.Port);
+
                         }
                         Console.WriteLine("");
                         Console.WriteLine("Other settings in config.json");
@@ -80,6 +83,10 @@ namespace MailServerMonitor
                         Console.WriteLine("  -u : One try only ");
                         Console.WriteLine("  -d [Num] : Delete the [Num] mailbox in config");
                         Console.WriteLine("Other settings in config.json");
+                        Console.WriteLine("");
+                        Console.WriteLine("Licensed under the Apache License, Version 2.0. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0");
+                        Console.WriteLine("Software distributed under the License is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND");
+
                         break;
                 }
             }
@@ -91,6 +98,7 @@ namespace MailServerMonitor
         {
             if (DataService.config.MailBoxes.Count == 0)
             {
+                DataService.config.Key = Libs.Cryptography.KeyGenerator.GetUniqueKeyOriginal_BIASED(12);
                 DataService.config.MailBoxes.Add(GetNewMailBox());
                 DataService.SaveConfig();
             }
@@ -99,25 +107,42 @@ namespace MailServerMonitor
         private static MailBoxConfig GetNewMailBox()
         {
             var mb = new MailBoxConfig();
-            Console.Write("eMail : ");
-            mb.eMail = Console.ReadLine();
-            Console.Write("\nServer : ");
-            mb.ServerName = Console.ReadLine();
-            Console.Write("\nLogin : ");
-            mb.Login = Console.ReadLine();
-            Console.Write("\nPassword : ");
-            mb.SetPassword(Console.ReadLine());
+            Console.Write("Name : ");
+            mb.Name = Console.ReadLine();
+            Console.Write("\nSMTP : \n");
+            Console.Write("  Email : ");
+            mb.Smtp.Email = Console.ReadLine();
+            Console.Write("\n  Server : ");
+            mb.Smtp.Server = Console.ReadLine();
+            Console.Write("\n  Login : ");
+            mb.Smtp.Login = Console.ReadLine();
+            Console.Write("\n  Password : ");
+            mb.Smtp.SetPassword(Console.ReadLine(), DataService.config.Key);
+            Console.Write("\nIMAP : \n");
+            Console.Write("  Email : ");
+            mb.Imap.Email = Console.ReadLine();
+            Console.Write("\n  Server : ");
+            mb.Imap.Server = Console.ReadLine();
+            Console.Write("\n  Login : ");
+            mb.Imap.Login = Console.ReadLine();
+            Console.Write("\n  Password : ");
+            mb.Imap.SetPassword(Console.ReadLine(), DataService.config.Key);
             Console.WriteLine("\nEdit config.json for other values.");
             return mb;
         }
+
+
         private static void CheckMailBoxes()
         {
+            Stopwatch delay = new Stopwatch();
+
+            delay.Start();
             do
             {
                 foreach (MailBoxConfig mb in DataService.config.MailBoxes)
                 {
-                    Console.WriteLine("Check : {0}", mb.eMail);
-                    var his = Libs.MailBoxTester.Test(mb);
+                    Console.WriteLine("{0}   Check : {1}", DateTime.Now.ToString("g"),mb.Name);
+                    var his = Libs.MailBoxTester.Test(mb, DataService.config.Key);
 
                     DataService.AddToCSV(his);
                     if (his.StmpConnected)
@@ -136,8 +161,11 @@ namespace MailServerMonitor
                     {
                         Console.WriteLine("   IMAP : Erreur  " + his.ImapError);
                     }
-                    Thread.Sleep(DataService.config.AskMin * 60000);
                 }
+
+                // Sleep
+                while((delay.ElapsedMilliseconds/60000) < DataService.config.AskMin) Thread.Sleep(1000);
+                delay.Restart();
             } while (DataService.config.AskMin > 0);
         }
     }

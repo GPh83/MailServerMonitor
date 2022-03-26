@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MailServerMonitor.Models
 {
@@ -17,39 +14,46 @@ namespace MailServerMonitor.Models
 
         public string CSVName { get; set; } = "MailServerMonitor.csv";
 
+        public string Key { get; set; }
+
     }
 
     internal class MailBoxConfig
     {
-        public string eMail { get; set; }
+        public string Name { get; set; }
 
-        public int TimeOutMs { get; set; } = 30000;
+        public ServerConfig Imap { get; set; } = new ServerConfig { Port = 993 };
 
-        public string ServerName { get; set; }
-        
-        public string Login { get; set; }
-        
-        public string EncryptedPassword { get; set; }
+        public ServerConfig Smtp { get; set; } = new ServerConfig { Port = 465 };
 
-        public int ImapPort { get; set; } = 993;
-
-        public bool ImapSSL { get; set; } = true;
-
-        public int SmtpPort { get; set; } = 465;
-
-        public bool SmtpSSL { get; set; } = true;
-
-
-        internal String GetPassword()
-        {
-            return Libs.Cryptography.Decrypt(EncryptedPassword, "dg5d4g699dfsf");
-        }
-
-        internal void SetPassword(String uncryptedPassword)
-        {
-            EncryptedPassword = Libs.Cryptography.Encrypt(uncryptedPassword, "dg5d4g699dfsf");
-        }
     }
 
 
+    internal class ServerConfig
+    {
+        public string Email { get; set; }
+
+        public string Server { get; set; }
+
+        public int TimeOutMs { get; set; } = 30000;
+
+        public string Login { get; set; }
+
+        public string EncryptedPassword { get; set; }
+
+        public int Port { get; set; }
+
+        public bool UseSSL { get; set; } = true;
+
+
+        internal String GetPassword(string salt)
+        {
+            return Libs.Cryptography.Decrypt(EncryptedPassword, "3Ag-ZFQmR_b4kXHo" + salt);
+        }
+
+        internal void SetPassword(string uncryptedPassword, string salt)
+        {
+            EncryptedPassword = Libs.Cryptography.Encrypt(uncryptedPassword, "3Ag-ZFQmR_b4kXHo" + salt);
+        }
+    }
 }
